@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>সুটিং গেম</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #111;
+    }
+    canvas {
+      display: block;
+      background: #222;
+    }
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 20px;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="score">স্কোর: 0</div>
+  <canvas id="gameCanvas"></canvas>
+  <audio id="bgMusic" src="assets/music.mp3" autoplay loop></audio>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let score = 0;
+
+    const targets = [
+      { imgSrc: 'assets/target1.png', x: 50, y: 100, width: 100, height: 100 },
+      { imgSrc: 'assets/target2.jpeg', x: 200, y: 300, width: 100, height: 100 },
+    ];
+
+    const images = [];
+    let loaded = 0;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    targets.forEach((t, index) => {
+      const img = new Image();
+      img.src = t.imgSrc;
+      img.onload = () => {
+        images[index] = img;
+        loaded++;
+        if (loaded === targets.length) draw();
+      };
+    });
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      targets.forEach((t, i) => {
+        ctx.drawImage(images[i], t.x, t.y, t.width, t.height);
+      });
+    }
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      targets.forEach((t, i) => {
+        if (
+          mouseX >= t.x && mouseX <= t.x + t.width &&
+          mouseY >= t.y && mouseY <= t.y + t.height
+        ) {
+          score++;
+          document.getElementById('score').textContent = 'স্কোর: ' + score;
+          t.x = Math.random() * (canvas.width - t.width);
+          t.y = Math.random() * (canvas.height - t.height);
+          draw();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
